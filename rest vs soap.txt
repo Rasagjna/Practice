@@ -1,0 +1,10 @@
+-> messaging protocol specification for exchanging structured information in the implementation of Only XML
+web services. function driven -> data here is available as services. Stateless**, but can be made stateful. More bandwidth and computing power.
+-> SOAP  works on HTTP,SMTP,UDP and other. Usedul for enterprose applications, financial services etc
+
+-> rest api is that conforms to the constraints of rest architectural style  and
+allows interaction with restful web services. stateless.  API calls can be cached. Can take XML, JSON, YAML and others.
+requires very few resources. more powerful. Only HTTP.For public APIS, web services, social netwroks.
+ Data driven
+
+

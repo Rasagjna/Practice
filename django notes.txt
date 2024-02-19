@@ -1,0 +1,16 @@
+what is view?
+code that handles request and returns responses. can be a function or a class.
+
+client  req server
+               url
+              view
+ response
+
+the logic that is executed for different urls (and Http methods)
+
+Permissions:
+
+Allow Any
+IsAuthenticated
+IsAdminUser
+IsAuthenticatedOrReadOnly

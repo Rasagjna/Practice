@@ -1,0 +1,20 @@
+passing a function to a function. - functional programming.
+names,forEach(System.out::println) - method  referencing.
+
+ class Myprinter{
+public void print(String s)
+{
+sysout(s)
+}
+}
+
+public class FirstCode{
+public static void main(String[] args)
+{
+String str="Navin Reddy";
+Myprinter mp=new MyPrinter();
+mp.print(str); 
+}
+} 
+
+----------------------------------------------------------

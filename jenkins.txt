@@ -1,0 +1,33 @@
+-> DevOps is a software development approach which invloves continuous development,continuous testing,continuous integration,continuous development,
+and continuous monitoring through out its development lifecycle.
+
+                    STAGES OF DEVOPS:
+
+->  1. version control : source code management.
+
+    2. continuous integration : compile, validate, code review, unit testing,
+integration testing.
+
+    3.  continuous delivery  : deploying the build application to test servers, performing 
+UAT.
+
+continuous monitoring:
+
+-> 1. VERSION CONTROL
+   2. BUILD - Compile
+   3. UNIT TEST -testing ,integration testing
+   4. DEPLOY- stage where code is deployed successfully.
+   5.AUTO TEST - 
+   6. DEPLOY TO PRODUCTION
+   7. MEASURE+VALIDATE
+
+continuous integration: putting all the code together, merging and building
+continuous delivery: 
+CI/CD :
+
+-> deployable unit path is called pipeline. The path to the production servers where it is
+deployed on to the live servers.
+
+-> 
+
+   

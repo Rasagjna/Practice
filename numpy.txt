@@ -1,0 +1,13 @@
+numpy- mathematics, plotting, backend(pandas), machine learning.
+b = np.array([9.0,8.0,7,0], [6.0,5.0,4,0]])
+print(b)
+
+b.ndim - dimension of array
+b.shape - it gives no of rows and columns of the array.
+a.dtype
+
+
+
+ 
+
+     

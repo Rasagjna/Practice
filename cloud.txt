@@ -1,0 +1,35 @@
+types of cloud computing:
+
+SaaS - salesforce,gmail,office 365 --> a product that is run and managed by the service provider.
+       Dont worry about how the service is maintained. It just works and remains available.
+
+Paas - focus on deplyment and management of your apps. Dont worry about, provisioning,configuring or understanding the 
+       hardware or OS.
+    EG: heroku
+
+IaaS - basic building blocks of cloud IT. AdminsEG: AWS
+--------------------------------------------------------------------------------
+Public Cloud:
+everything built on the cloud provider
+Cloud - native
+
+public subnet, private subnet.
+
+Private cloud:
+everything build on company's datacenters.Also known as on-premise
+
+Hybrid:
+using both on-premise and a cloud service provider.
+
+
+--------------------------------------------------------
+
+on premise - you are responsible for everything.
+---------------------------------------------
+***Azure virtual network(vNet) and Subnets
+
+Virtual Network(vNet) is a logically isolated section of the Azure Network where you launch your Azure resources.
+You choose a range of IPs using CIDR Range.
+
+CIDR Range of 10.0.0.0/16 = 65536 IP Addresses
+

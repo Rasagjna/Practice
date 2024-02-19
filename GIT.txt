@@ -1,0 +1,228 @@
+
+1. git init
+2. git config --list
+3. Global (available for all the projects on the system),
+System(available for git operations) and Local level(.git repository)
+4. 2 most important config parameters to be set at global level
+
+user.name --> commit
+user.email 
+
+> git config --global user.name rasagjna
+> git config --global user.email kuchi_rasagjna@persistent.com
+
+> touch <file name>
+> git status - status of Working directory
+> git add <file name> - adds the file to staging area
+> git status
+> git rm --cached <file> --> removes file from SA/caching area
+> git add *
+> git commit -m "initial commit of math.py"
+> git log --> check the version history of project
+
+> SHA - Secure Hash Algorithm - SHA -1
+> hash = SHA(input data) = data can be in bits/Bytes/GBs/TBs
+> properties SHA-
+1. deterministic - for same input we always get same output.
+2. Output should be fixed length
+3. Avalanche effect- for minor change, entire hash value changes
+(to avoid hacking)
+4. unique value - no 2 inputs should have same hash value.
+
+> git restore --staged README.txt
+> git add .
+> git commit -m "initial commit of README.txt and add() fn header for math.py"
+
+> git add + git commit - git commit -a -m "" - use only when file is being tracked.
+> git log
+> git log --oneline
+> git log -2 --oneline
+> git log -p -2 - changes related to latest 2 commits
+> git log -p -2 --> changes done for every commit
+> git log --grep="Initial"
+> git log --author="pallavijog123"
+>Q - quit
+> git log --since="07/30/2021" - commits after this date
+> git log --until ="07/30/2021" - on and before
+> git log --help
+> git help commit 
+> git commit --amend -m "<msg>"  --> to update latest commit message
+> git diff --> gives you the diff between stages (WD,SA,Local Repo)
+
+                      wd --->     sa--->    lr
+                      -------------------------
+ git diff (compares difference btw wd and sa)-->         change1                   ----> change1
+ git diff HEAD                                  -----> change1
+
+2. put changes to SA
+git diff-->           change1   change1         ---> no output
+                                                 ----> change1
+git diff HEAD (diff btw wd and lr)
+--------------------------------------------------------------------------
+git restore --staged math.py  --> restores changes in staging area from lr(i.e makes local repo and staging area same without extra lines of code)
+git restore <file>  --> restores changes in wd from lr
+-------------------------------------------------------------------------
+undoing of committed changes
+1. Safe way (git revert) 2. unsafe way
+--------------------
+git revert <sha value>
+:wq
+extra commit is added stating the revert fn- thus revert can also be reverted.
+> double revert brings down the original changes
+>git reset --hard <SHA VALUE>
+> git reset --hard HEAD~2
+> ignore (from being tracked) certain types of file - 
+files that needs to be tracked - documents, pri=ojct code files, files being updated manually, webpages
+log files, executable files, .o,.tmp library
+
+
+.gitignore- open
+write the following:
+setup.exe
+*.log
+
+> git cannot track folders. put .gitignorefile in folder to get tracked.
+> renaming files - git mv README.txt README.md
+
+
+BRANCHES:
+
+> git branch <branch name>
+> git checkout -b <branch name>
+> 2 types of commands-
+1. Porcelain commands -  git add, git commit, git status, git branch..
+2. Plumbing commands - core commands ( never used in projects)
+
+> git cat-file-file -t <Hash Value>
+> git cat-file commit <Hash Value>- gives commit related info
+
+1. Commit
+2. Tree
+3. blob
+
+> git checkout master
+
+> git branch
+
+BRANCHING AND MERGING:
+------------------------------------------
+sCENARIO#1 - CREATE NEW BRANCH, perform commit on new branch AND NO EXTRA COMMIT ON MASTER BRANCH
+
+> git branch bug123
+> git checkout bug123
+> git commit -am "msg" ---> this goes on bug123 branch
+
+MERGE:
+
+> git checkout master
+> git merge bug123 --> merge commit from bug123 into current branch
+-----------------------------------------------------------------------
+SCENARIO #2 -  one or more commit on new branch and one or more commits on master branch(without conflict situation)
+> git log --graph --decorate --oneline
+> git branch -d bug123 (execute it after checking out to master)
+
+Implementation:
+> git branch bug456
+> git commit -am <msg> --> perform 1 commit on master branch
+> git checkout bug456
+>git commit -am <msg> -->perform 1 commit on bug branch
+> git rebase master --> execute this while you are on bug branch
+> git checkout master
+> git merge bug456
+give message to new commit
+
+> git branch -d bug456
+------------------------------------------------------------------------
+SCENARIO #3 -  one or more commit on new branch and one or more commits on master branch(with conflict situation)
+> git branch bug789
+> git commit -am <msg> --> perform 1 commit on master branch
+> git checkout bug789
+>git commit -am <msg> -->perform 1 commit on bug branch
+> git checkout master
+> git merge bug789(resolve conflict)
+give message to new commit
+
+> git branch -d bug456
+-----------------------------------------------------------------------
+
+GIT REBASING - avoids creating extra commit. Linearity. avoids parallel branches
+git rebase master
+> git checkout master
+> git merge <branch name>
+-----------------------------------------------------------------------
+> git add math.py
+> git rebase --continue
+--------------------------------------------------
+> git branch -m <old branch name> <new name> --> renaming branch
+> git branch + git checkout --> git checkout -b <branch name> <SHA>
+--------------------------------------------------------
+
+TAGGING: 
+> tag is like a label.
+> git tag v1.0- creates tag at the latest commit
+> git tag v0.9 <SHA value> - creates tag at the particular sha value
+
+give inline message
+>git tag v0.1 -m "created the project."
+> git tag -n = list of all tags
+> git tag -l "v0*"  - pattern
+----------------------------------------------------------------------
+
+STASHING:
+> temporary changes (stores locally in tmp location)
+> git stash
+> git stash list
+> git stash apply
+> latest stash gets index of 0
+> git stash -m <msg>
+> git stash pop - applies latest stash and also removes it from list.
+> git stash clear - to clear entire list
+-------------------------------------------------------------------
+
+                                  GITHUB
+> LOCAL REPOSITORY - .GIT FOLDER
+
+wd <-- LR <-- fetch { equivalent to pull command .Combination of fetch and merge}
+
+>>>>>>2 ways to add remote to local repo
+1. Add remote:
+-->
+>git init
+> git remote add <remote_name> <.git>
+> git remote origin <url>
+github--> code ---> https--> url
+> git merge origin/main
+
+2.clone:
+
+> git clone <.git> 
+-----------------------------------------------------------------------------
+
+> git pull origin - pulls changes to local repo from remote repo
+> before pushing to remote, we should commit it locally
+> git push origin 
+> git push origin Bug456:Bug456_remote - new branch is created in remote repository.
+> git checkout -b Feature_local origin/Feature1
+
+---------------------------------------------
+>git fetch origin
+> git rebase origin/main
+> git push origin
+
+rebasing with remore repo
+implementation:
+> perform 1 commit on remote repo on main branch
+> perform 1 commit on local repo on main branch
+
+Rebasing
+> git fetch origin --> fetch the changes from remote to local repo and not in WD
+>git rebase origin/main --> rebase local main with remote main
+> git push origin
+
+pull will overwrite the details in working directory.
+> fetch updates local copy of remote branch
+> pull merges with WD
+> pull then push
+> git bundle create repo.bundle HEAD main
+> git clone repo.bundle repo
+> 
