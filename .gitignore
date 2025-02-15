@@ -1,2 +1,25 @@
 /Django/env
 /llm_project/venv
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+redux-demo/node_modules
+redux-demo/.pnp
+redux-demo/.pnp.js
+
+# testing
+redux-demo/coverage
+
+# production
+redux-demo/build
+
+# misc
+redux-demo/.DS_Store
+redux-demo/.env.local
+redux-demo/.env.development.local
+redux-demo/.env.test.local
+redux-demo/.env.production.local
+
+redux-demo/npm-debug.log*
+redux-demo/yarn-debug.log*
+redux-demo/yarn-error.log*
