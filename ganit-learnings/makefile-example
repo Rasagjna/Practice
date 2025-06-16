@@ -1,0 +1,63 @@
+.PHONY: start_celery_workers
+start_celery_workers:
+	@echo "Starting $(NUM_WORKERS) workers..."
+	@for i in $(shell seq 1 $(NUM_WORKERS)); do \
+		PYTHONPATH="$(ROOT_DIR)/src/" celery -A service worker -Q "ai_insights" --pool=solo -E -D -n "ai_insights_celery_$$i@%n" --logfile="$(ROOT_DIR)/temp/logs/celery.log"; \
+	done
+
+.PHONY: start_test_celery_worker
+start_test_celery_worker:
+	# Starting 2 workers (Recommended. To support gmail in a background thread)
+	(PYTHONPATH="$(ROOT_DIR)/src/" uv run celery -A  service  worker -Q "ai_insights" --pool=solo -E -n "ai_insights_celery_1@%n")
+
+
+.PHONY: kill_celery_workers
+kill_celery_workers:
+	echo Number of workers found: $$(ps auxww | grep 'ai_insights' | grep -v " grep " | awk '{print $$2}' | wc -l)
+	echo Deleting...
+	ps auxww | grep 'ai_insights' | grep -v " grep " | awk '{print $$2}' | xargs kill -9
+	echo Number of workers post delete: $$(ps auxww | grep 'ai_insights' | grep -v " grep " | awk '{print $$2}' | wc -l)
+
+
+.PHONY: monitor_celery_workers_flower
+monitor_celery_workers_flower:
+	(PYTHONPATH="$(ROOT_DIR)/src/" uv run celery -A service flower --port=5556)
+
+.PHONY: monitor_celery_workers
+monitor_celery_workers:
+	# Stats
+	#(PYTHONPATH=$(PYTHONPATH) celery -A src inspect stats)
+	# Number of nodes
+	(PYTHONPATH="$(ROOT_DIR)/src/" uv run celery -A service status)
+	# View active tasks
+	#(PYTHONPATH=$(PYTHONPATH) celery -A src inspect active)
+
+.PHONY: monitor_celery_workers
+monitor_celery_workers:
+	# Stats
+	#(PYTHONPATH=$(PYTHONPATH) celery -A src inspect stats)
+	# Number of nodes
+	(PYTHONPATH="$(ROOT_DIR)/src/" uv run celery -A service status)
+	# View active tasks
+	#(PYTHONPATH=$(PYTHONPATH) celery -A src inspect active)
+
+# Run the application locally with docker-compose
+.PHONY: docker_run stop_app
+
+docker_run: docker_build_all docker_run_app docker_run_celery
+
+docker_run_app: 
+	echo "Running application with docker-compose using $(ENV_FILE)..." && \
+	docker compose --env-file $(ENV_FILE) up -d
+
+stop_app:
+	echo "Stopping application with docker-compose using $(ENV_FILE)..." && \
+	docker compose --env-file $(ENV_FILE) down
+
+# Run the celery application locally with docker-compose
+.PHONY: docker_run_celery  stop_celery
+stop_celery:
+	echo "Stopping celery workers with docker-compose using $(ENV_FILE)..." && \
+	docker compose --env-file $(ENV_FILE) --profile celery_worker down
+docker_run_celery: 
+	@echo "Starting celery workers with docker-compose using $(ENV_FILE)..."
