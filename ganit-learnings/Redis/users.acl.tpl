@@ -1,0 +1,1 @@
+user ${FACILITY__REDIS_USER} on >${FACILITY__REDIS__PASS} ~* &* +@all

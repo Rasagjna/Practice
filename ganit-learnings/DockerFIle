@@ -1,0 +1,113 @@
+###############################################################################
+# BUILD STAGE
+# This stage installs all dependencies and prepares the application
+###############################################################################
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim AS builder
+
+# Set Python and UV environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=0
+
+WORKDIR /build
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    git \
+    openssh-client \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Setup SSH for private repository access
+RUN mkdir -p -m 0700 /root/.ssh
+RUN --mount=type=ssh ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# Install Python dependencies
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=ssh \
+    uv sync --frozen
+
+# Install NLTK and download data:
+RUN uv pip install nltk && \
+    mkdir -p /build/nltk_data && \
+    uv run python -m nltk.downloader -d /build/nltk_data stopwords
+
+# Copy application code
+COPY src/ ./src/
+
+
+
+###############################################################################
+# RUNTIME STAGE
+# This stage contains only the runtime dependencies and application code
+###############################################################################
+FROM python:3.11-slim-bookworm AS runtime
+
+# Build arguments for configuration
+ARG APP_PORT=8002
+ARG CONFIG_PATH=config.yaml
+ARG LOOKUP_FILES_PATH=local-assets/lookup_files
+ARG MODELS_PATH=local-assets/models
+ARG GOOGLE_CREDS_PATH=local-assets/credentials/application_default_credentials.json
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH" \
+    NLTK_DATA=/app/nltk_data
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    gnupg \
+    libgomp1 \
+    gcc \
+    libglib2.0-0 && \
+    # Create app user and directories
+    groupadd -r appuser --gid=1000 && \
+    useradd -r -g appuser --uid=1000 --create-home appuser && \
+    mkdir -p /app/credentials /app/lookup_files /app/models && \
+    chown appuser:appuser /app && \
+    # Add gcloud CLI repo and key
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" \
+    > /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    | gpg --dearmor > /usr/share/keyrings/cloud.google.gpg && \
+    apt-get update && apt-get install -y google-cloud-sdk && \
+    # Cleanup
+    rm -rf /var/lib/apt/lists/*
+
+# Copy virtual environment and application from builder stage
+COPY --from=builder --chown=appuser:appuser /build/.venv /app/.venv
+COPY --from=builder --chown=appuser:appuser /usr/local/bin/uv /usr/local/bin/uv
+COPY --from=builder --chown=appuser:appuser /build/src /app/src
+COPY --from=builder --chown=appuser:appuser /build/nltk_data /app/nltk_data
+
+# Copy configuration files
+COPY --chown=appuser:appuser ${CONFIG_PATH} /app/config.yaml
+COPY --chown=appuser:appuser ${LOOKUP_FILES_PATH}/ /app/lookup_files/
+COPY --chown=appuser:appuser ${MODELS_PATH}/ /app/models/
+COPY --chown=appuser:appuser ${GOOGLE_CREDS_PATH} /app/credentials/application_default_credentials.json
+
+# Copy and setup entrypoint
+COPY --chown=appuser:appuser docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Switch to non-root user
+USER appuser
+
+# Expose application port
+EXPOSE ${APP_PORT}
+
+# Set entrypoint and default command
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["serve"]
+# CMD ["/bin/bash", "-c", "uv run src/manage.py migrate && PYTHONPATH=src uv run uvicorn service.asgi:app --reload --port=8002"]

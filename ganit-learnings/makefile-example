@@ -61,3 +61,23 @@ stop_celery:
 	docker compose --env-file $(ENV_FILE) --profile celery_worker down
 docker_run_celery: 
 	@echo "Starting celery workers with docker-compose using $(ENV_FILE)..."
+
+
+# Generate init-db.sql from template using envsubst (you can adjust this if needed)
+init-db:
+	@echo "Generating init-db.sql from template using dockerized envsubst..."
+	@docker run --rm \
+		-v $(shell pwd):/workdir \
+		-w /workdir \
+		--env-file $(ENV_INFRA) \
+		alpine \
+		sh -c "apk add --no-cache gettext && envsubst < init-db.sql.tpl > init-db.sql"
+
+init-redis:
+	@echo "Generating Redis users.acl from template..."
+	@docker run --rm \
+		-v $(shell pwd):/workdir \
+		-w /workdir \
+		--env-file $(ENV_INFRA) \
+		alpine \
+		sh -c "apk add --no-cache gettext && envsubst < redis/users.acl.tpl > redis/users.acl"
